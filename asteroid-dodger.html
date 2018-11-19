@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html>
+<!-- 
+    Problem:
+    1. Problem med acceleration i sidleds
+
+    TODO:
+    1. Lägg till så att man dör om man nuddar sidorna
+    2. Lägg till objekt som man kan åka in i för att få poäng
+    3. Lägg till fungerande resetButton
+-->
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <style>
+        canvas {
+            border: 1px solid #d3d3d3;
+            background-color: #f1f1f1;
+        }
+    </style>
+</head>
+
+<body onload="startGame()">
+    <script>
+
+        var myGamePiece;
+        var myObstacles = [];
+
+        function startGame() {
+            myGamePiece = new component(30, 30, "red", 80, 500);
+            myGameArea.start();
+        }
+
+        var myGameArea = {
+            canvas: document.createElement("canvas"),
+            start: function () {
+                this.canvas.width = 300;
+                this.canvas.height = 500;
+                this.context = this.canvas.getContext("2d");
+                document.body.insertBefore(this.canvas, document.body.childNodes[0]);
+                this.frameNo = 0;
+                this.interval = setInterval(updateGameArea, 20);
+                window.addEventListener('keydown', function (e) {
+                    myGameArea.keys = (myGameArea.keys || []);
+                    myGameArea.keys[e.keyCode] = (e.type == "keydown");
+                })
+                window.addEventListener('keyup', function (e) {
+                    myGameArea.keys[e.keyCode] = (e.type == "keydown");
+                })
+            },
+            stop: function () {
+                clearInterval(this.interval);
+            },
+            clear: function () {
+                this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+            }
+        }
+
+        function component(width, height, color, x, y, type) {
+            this.type = type;
+            this.width = width;
+            this.height = height;
+            this.x = x;
+            this.y = y;
+            this.speedX = 0;
+            this.speedY = 0;
+            this.gravity = 0.01;
+            this.gravitySpeed = 0;
+            this.air = 0;
+            this.airSpeed = 0;
+            this.update = function () {
+                ctx = myGameArea.context;
+                ctx.fillStyle = color;
+                ctx.fillRect(this.x, this.y, this.width, this.height);
+            }
+            this.newPos = function () {
+                this.gravitySpeed += this.gravity;
+                this.airSpeed += this.air;
+                this.x += this.speedX + this.airSpeed;
+                this.y += this.speedY + this.gravitySpeed;
+                this.hitBottom();
+                console.log(this.airSpeed);
+
+            }
+            this.hitBottom = function () {
+                var rockbottom = myGameArea.canvas.height - this.height;
+                if (this.y > rockbottom) {
+                    this.y = rockbottom;
+                    this.gravitySpeed = 0;
+                    myGamePiece.speedY = 0;
+                    myGamePiece.speedX = 0;
+                }
+            }
+            this.crashWith = function (otherobj) {
+                var myleft = this.x;
+                var myright = this.x + (this.width);
+                var mytop = this.y;
+                var mybottom = this.y + (this.height);
+                var otherleft = otherobj.x;
+                var otherright = otherobj.x + (otherobj.width);
+                var othertop = otherobj.y;
+                var otherbottom = otherobj.y + (otherobj.height);
+                var crash = true;
+                if ((mybottom < othertop) || (mytop > otherbottom) || (myright < otherleft) || (myleft > otherright)) {
+                    crash = false;
+                }
+                return crash;
+            }
+
+        }
+
+        function accelerate(n) {
+            myGamePiece.gravity = n;
+        }
+
+        function accelerateAir(n) {
+            myGamePiece.air = n;
+        }
+
+        function updateGameArea() {
+            myGameArea.clear();
+            myGamePiece.speedX = 0;
+            myGamePiece.speedY = 0;
+            var y, height, gap, minHeight, maxHeight, minGap, maxGap;
+            for (i = 0; i < myObstacles.length; i += 1) {
+                if (myGamePiece.crashWith(myObstacles[i])) {
+                    myGameArea.stop();
+                    return;
+                }
+            }
+            myGameArea.clear();
+            myGameArea.frameNo += 1;
+            if (myGameArea.frameNo == 1 || everyinterval(150)) {
+                y = myGameArea.canvas.height;
+                minHeight = 20;
+                maxHeight = 40;
+                height = Math.floor(Math.random() * (maxHeight - minHeight + 1) + minHeight);
+                minGap = 0;
+                maxGap = 300;
+                gap = Math.floor(Math.random() * (maxGap - minGap + 1) + minGap);
+                myObstacles.push(new component(height, height, "green", gap, -50));
+                myObstacles.push(new component(10, 10, "red", 40, -200));
+            }
+            for (i = 0; i < myObstacles.length; i += 1) {
+                myObstacles[i].y += 2;
+                myObstacles[i].update();
+            }
+            if (myGameArea.keys && myGameArea.keys[37]) {
+                var x = myGamePiece.speedX = -1;
+                x + accelerateAir(-0.01);
+            } else {
+                this.airSpeed = 0;
+            }
+
+            if (myGameArea.keys && myGameArea.keys[39]) {
+                var x = myGamePiece.speedX = 1;
+                x + accelerateAir(0.01)
+            } else {
+                this.air = 0;
+            }
+
+            if (myGameArea.keys && myGameArea.keys[38]) {
+                accelerate(-0.2);
+            } else {
+                accelerate(0.1)
+            }
+
+            if (myGameArea.keys && myGameArea.keys[40]) {
+                accelerate(0.15)
+            }
+
+            myGamePiece.newPos();
+            myGamePiece.update();
+        }
+        function everyinterval(n) {
+            if ((myGameArea.frameNo / n) % 1 == 0) { return true; }
+            return false;
+        }
+
+
+
+    </script>
+
+</body>
+<br>
+<button onclick="stop(); clear(); startGame()">Start Game</button>
+
+</html>

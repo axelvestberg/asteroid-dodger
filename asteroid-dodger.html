@@ -2,12 +2,23 @@
 <html>
 <!-- 
     Problem:
-    1. Problem med acceleration i sidleds
+    1. Problem med acceleration i sidleds, den ska nollställas när man byter riktning i sidleds
+    
+    Generella tankar:
+    1. Spelet ska gå ut på att undvika objekten som kommer emot en.
+    2. Ta bort den ständiga gravitationen i Y-led och gör så att det istället blir en slags friktion och flytande i kontrollkänslan,
+        om man byter riktning ska den inte byta riktning direkt utan glida lite för att skapa en slags verklighetskänsla
+    3. Lägg till att man får X poäng för den tid som spelet har varit igång, samt att man kan samla poäng genom att samla in poängobjekt,
+    4. Lägg till så att man för varje tid som gått också förlorar bränsle. När man når 0 bränsle så förlorar man. För att inte förlora av
+        0 bränsle så kan man samla in bräsnleobjekt.
+    5. Lägg till så att objektens fart ökar ju längre omgången blir.
 
     TODO:
     1. Lägg till så att man dör om man nuddar sidorna
     2. Lägg till objekt som man kan åka in i för att få poäng
     3. Lägg till fungerande resetButton
+    4. Randomisera farten på hur snabbt obstacles och andra objekt faller
+    5. 
 -->
 
 <head>
@@ -79,7 +90,6 @@
                 this.x += this.speedX + this.airSpeed;
                 this.y += this.speedY + this.gravitySpeed;
                 this.hitBottom();
-                console.log(this.airSpeed);
 
             }
             this.hitBottom = function () {
@@ -111,6 +121,7 @@
 
         function accelerate(n) {
             myGamePiece.gravity = n;
+            
         }
 
         function accelerateAir(n) {
@@ -178,11 +189,10 @@
         }
 
 
-
+console.log(updateGameArea);
     </script>
 
 </body>
 <br>
-<button onclick="stop(); clear(); startGame()">Start Game</button>
-
+<button onclick="startGame()">Start Game</button>
 </html>

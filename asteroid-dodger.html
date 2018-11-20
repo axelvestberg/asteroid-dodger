@@ -157,15 +157,15 @@
                 myObstacles[i].update();
             }
             if (myGameArea.keys && myGameArea.keys[37]) {
-                var x = myGamePiece.speedX = -1;
-                x + accelerateAir(-0.01);
+                var x = myGamePiece.speedX = -2;
+                //x + accelerateAir(-0.01);
             } else {
                 this.airSpeed = 0;
             }
 
             if (myGameArea.keys && myGameArea.keys[39]) {
-                var x = myGamePiece.speedX = 1;
-                x + accelerateAir(0.01)
+                var x = myGamePiece.speedX = 2;
+                //x + accelerateAir(0.01)
             } else {
                 this.air = 0;
             }
@@ -177,7 +177,7 @@
             }
 
             if (myGameArea.keys && myGameArea.keys[40]) {
-                accelerate(0.15)
+                accelerate(0.2)
             }
 
             myGamePiece.newPos();

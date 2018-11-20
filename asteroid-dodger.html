@@ -14,11 +14,11 @@
     5. Lägg till så att objektens fart ökar ju längre omgången blir.
 
     TODO:
-    1. Lägg till så att man dör om man nuddar sidorna
+    1. Lägg till så att man dör om man nuddar sidorna (tar skada iaf)
     2. Lägg till objekt som man kan åka in i för att få poäng
     3. Lägg till fungerande resetButton
     4. Randomisera farten på hur snabbt obstacles och andra objekt faller
-    5. 
+    5. Randomisera riktning på hur obstacles faller
 -->
 
 <head>
@@ -36,6 +36,7 @@
 
         var myGamePiece;
         var myObstacles = [];
+        var myScoreObjects = [];
 
         function startGame() {
             myGamePiece = new component(30, 30, "red", 80, 500);
@@ -48,7 +49,7 @@
 
                 if (screen.availWidth > 600) {
                     this.canvas.width = 600
-                } else { this.canvas.width = screen.innerW }
+                } else { this.canvas.width = screen.availWidth }
 
                 if (screen.availHeight > 900) {
                     this.canvas.height = 900
@@ -57,8 +58,6 @@
                 console.log('canvas width: ' + this.canvas.width);
                 console.log('canvas height: ' + this.canvas.height);
 
-                //this.canvas.width = 300;
-                //this.canvas.height = 500;
                 this.context = this.canvas.getContext("2d");
                 document.body.insertBefore(this.canvas, document.body.childNodes[0]);
                 this.frameNo = 0;
@@ -76,6 +75,14 @@
             },
             clear: function () {
                 this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+            },
+            gameOver: function () {
+                var score = myGameArea.frameNo;
+                ctx = myGameArea.context;
+                ctx.font = "100px Verdana";
+                ctx.fillStyle = "red";
+                ctx.textAlign = "center";
+                ctx.fillText(score, this.canvas.width / 2, this.canvas.height / 2);
             }
         }
 
@@ -114,6 +121,8 @@
                     this.gravitySpeed = 0;
                     myGamePiece.speedY = 0;
                     myGamePiece.speedX = 0;
+                    myGameArea.stop();
+                    myGameArea.gameOver();
                 }
             }
             this.hitRight = function () {
@@ -122,6 +131,8 @@
                     this.x = rightBorder;
                     this.airSpeed = 0;
                     myGamePiece.speedX = 0;
+                    myGameArea.stop();
+                    myGameArea.gameOver();
                 }
             }
             this.hitLeft = function () {
@@ -130,6 +141,8 @@
                     this.x = leftBorder;
                     this.airSpeed = 0;
                     myGamePiece.speedX = 0;
+                    myGameArea.stop();
+                    myGameArea.gameOver();
                 }
             }
             this.hitTop = function () {
@@ -137,9 +150,11 @@
                 if (this.y < topBorder) {
                     this.y = topBorder;
                     myGamePiece.gravitySpeed = 0;
+                    myGameArea.stop();
+                    myGameArea.gameOver();
                 }
             }
-            this.crashWith = function (otherobj) {
+            this.collision = function (otherobj) {
                 var myleft = this.x;
                 var myright = this.x + (this.width);
                 var mytop = this.y;
@@ -153,6 +168,21 @@
                     crash = false;
                 }
                 return crash;
+            }
+            this.catch = function (otherobj) {
+                var myleft = this.x;
+                var myright = this.x + (this.width);
+                var mytop = this.y;
+                var mybottom = this.y + (this.height);
+                var otherleft = otherobj.x;
+                var otherright = otherobj.x + (otherobj.width);
+                var othertop = otherobj.y;
+                var otherbottom = otherobj.y + (otherobj.height);
+                var caught = true;
+                if ((mybottom < othertop) || (mytop > otherbottom) || (myright < otherleft) || (myleft > otherright)) {
+                    caught = false;
+                }
+                return caught;
             }
 
         }
@@ -171,12 +201,23 @@
             myGamePiece.speedX = 0;
             myGamePiece.speedY = 0;
             var y, height, gap, minHeight, maxHeight, minGap, maxGap;
+            //Obstacles collision check
             for (i = 0; i < myObstacles.length; i += 1) {
-                if (myGamePiece.crashWith(myObstacles[i])) {
-                    myGameArea.stop();
+                if (myGamePiece.collision(myObstacles[i])) {
+                    //myGameArea.stop();
+                    //myGameArea.gameOver();
                     return;
                 }
             }
+            //Score Objects collision check
+            for (i = 0; i < myScoreObjects.length; i += 1) {
+                if (myGamePiece.catch(myScoreObjects[i])) {
+                    //WRITE CODE FOR SCORE
+                    console.log('You caught a score object')
+                    return;
+                }
+            }
+
             myGameArea.clear();
             myGameArea.frameNo += 1;
             console.log(myGameArea.frameNo);
@@ -192,40 +233,29 @@
                 gapOne = Math.floor(Math.random() * (x + 1));
                 gapTwo = Math.floor(Math.random() * (x + 1));
                 gapThree = Math.floor(Math.random() * (x + 1));
-                myObstacles.push(new component(10, 10, "green", gapOne, -gapTwo));
+                myObstacles.push(new component(10, 10, "black", gapOne, -gapTwo));
                 myObstacles.push(new component(10, 10, "red", gapTwo, -height));
                 myObstacles.push(new component(10, 10, "orange", gapThree, -50));
-
+                myScoreObjects.push(new component(10, 10, "green", 100, -100));
             }
             for (i = 0; i < myObstacles.length; i += 1) {
-                myObstacles[i].y += 2;
+                myObstacles[i].y += 2.5;
                 myObstacles[i].update();
             }
 
+            for (i = 0; i < myScoreObjects.length; i += 1) {
+                myScoreObjects[i].y += 2.5;
+                myScoreObjects[i].update();
+            }
+
             //Left
-            if (myGameArea.keys && myGameArea.keys[37]) {
-                var x = myGamePiece.speedX = -2;
-                //x + accelerateAir(-0.01);
-            } else {
-                this.airSpeed = 0;
-            }
+            if (myGameArea.keys && myGameArea.keys[37]) { myGamePiece.speedX = -3; }
             //Right
-            if (myGameArea.keys && myGameArea.keys[39]) {
-                var x = myGamePiece.speedX = 2;
-                //x + accelerateAir(0.01)
-            } else {
-                this.air = 0;
-            }
+            if (myGameArea.keys && myGameArea.keys[39]) { myGamePiece.speedX = 3; }
             //Up
-            if (myGameArea.keys && myGameArea.keys[38]) {
-                accelerate(-0.2);
-            } else {
-                accelerate(0.1)
-            }
+            if (myGameArea.keys && myGameArea.keys[38]) { accelerate(-0.2); } else { accelerate(0.1) }
             //Down
-            if (myGameArea.keys && myGameArea.keys[40]) {
-                accelerate(0.2)
-            }
+            if (myGameArea.keys && myGameArea.keys[40]) { accelerate(0.2) }
 
             myGamePiece.newPos();
             myGamePiece.update();

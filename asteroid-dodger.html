@@ -169,15 +169,15 @@
                 }
                 return crash;
             }
-            this.catch = function (otherobj) {
+            this.catch = function (otherscoreobj) {
                 var myleft = this.x;
                 var myright = this.x + (this.width);
                 var mytop = this.y;
                 var mybottom = this.y + (this.height);
-                var otherleft = otherobj.x;
-                var otherright = otherobj.x + (otherobj.width);
-                var othertop = otherobj.y;
-                var otherbottom = otherobj.y + (otherobj.height);
+                var otherleft = otherscoreobj.x;
+                var otherright = otherscoreobj.x + (otherscoreobj.width);
+                var othertop = otherscoreobj.y;
+                var otherbottom = otherscoreobj.y + (otherscoreobj.height);
                 var caught = true;
                 if ((mybottom < othertop) || (mytop > otherbottom) || (myright < otherleft) || (myleft > otherright)) {
                     caught = false;

@@ -45,8 +45,20 @@
         var myGameArea = {
             canvas: document.createElement("canvas"),
             start: function () {
-                this.canvas.width = 300;
-                this.canvas.height = 500;
+
+                if (screen.availWidth > 600) {
+                    this.canvas.width = 600
+                } else { this.canvas.width = screen.innerW }
+
+                if (screen.availHeight > 900) {
+                    this.canvas.height = 900
+                } else { this.canvas.height = screen.availHeight }
+
+                console.log('canvas width: ' + this.canvas.width);
+                console.log('canvas height: ' + this.canvas.height);
+
+                //this.canvas.width = 300;
+                //this.canvas.height = 500;
                 this.context = this.canvas.getContext("2d");
                 document.body.insertBefore(this.canvas, document.body.childNodes[0]);
                 this.frameNo = 0;
@@ -90,15 +102,41 @@
                 this.x += this.speedX + this.airSpeed;
                 this.y += this.speedY + this.gravitySpeed;
                 this.hitBottom();
+                this.hitRight();
+                this.hitLeft();
+                this.hitTop();
 
             }
             this.hitBottom = function () {
-                var rockbottom = myGameArea.canvas.height - this.height;
-                if (this.y > rockbottom) {
-                    this.y = rockbottom;
+                var bottomBorder = myGameArea.canvas.height - this.height;
+                if (this.y > bottomBorder) {
+                    this.y = bottomBorder;
                     this.gravitySpeed = 0;
                     myGamePiece.speedY = 0;
                     myGamePiece.speedX = 0;
+                }
+            }
+            this.hitRight = function () {
+                var rightBorder = myGameArea.canvas.width - this.width;
+                if (this.x > rightBorder) {
+                    this.x = rightBorder;
+                    this.airSpeed = 0;
+                    myGamePiece.speedX = 0;
+                }
+            }
+            this.hitLeft = function () {
+                var leftBorder = 0;
+                if (this.x < leftBorder) {
+                    this.x = leftBorder;
+                    this.airSpeed = 0;
+                    myGamePiece.speedX = 0;
+                }
+            }
+            this.hitTop = function () {
+                var topBorder = 0;
+                if (this.y < topBorder) {
+                    this.y = topBorder;
+                    myGamePiece.gravitySpeed = 0;
                 }
             }
             this.crashWith = function (otherobj) {
@@ -121,7 +159,7 @@
 
         function accelerate(n) {
             myGamePiece.gravity = n;
-            
+
         }
 
         function accelerateAir(n) {
@@ -141,41 +179,50 @@
             }
             myGameArea.clear();
             myGameArea.frameNo += 1;
-            if (myGameArea.frameNo == 1 || everyinterval(150)) {
+            console.log(myGameArea.frameNo);
+            //Creating obstacles every 150 interval
+            if (myGameArea.frameNo == 1 || everyinterval(75)) {
                 y = myGameArea.canvas.height;
+                x = myGameArea.canvas.width;
                 minHeight = 20;
                 maxHeight = 40;
                 height = Math.floor(Math.random() * (maxHeight - minHeight + 1) + minHeight);
                 minGap = 0;
                 maxGap = 300;
-                gap = Math.floor(Math.random() * (maxGap - minGap + 1) + minGap);
-                myObstacles.push(new component(height, height, "green", gap, -50));
-                myObstacles.push(new component(10, 10, "red", 40, -200));
+                gapOne = Math.floor(Math.random() * (x + 1));
+                gapTwo = Math.floor(Math.random() * (x + 1));
+                gapThree = Math.floor(Math.random() * (x + 1));
+                myObstacles.push(new component(10, 10, "green", gapOne, -gapTwo));
+                myObstacles.push(new component(10, 10, "red", gapTwo, -height));
+                myObstacles.push(new component(10, 10, "orange", gapThree, -50));
+
             }
             for (i = 0; i < myObstacles.length; i += 1) {
                 myObstacles[i].y += 2;
                 myObstacles[i].update();
             }
+
+            //Left
             if (myGameArea.keys && myGameArea.keys[37]) {
                 var x = myGamePiece.speedX = -2;
                 //x + accelerateAir(-0.01);
             } else {
                 this.airSpeed = 0;
             }
-
+            //Right
             if (myGameArea.keys && myGameArea.keys[39]) {
                 var x = myGamePiece.speedX = 2;
                 //x + accelerateAir(0.01)
             } else {
                 this.air = 0;
             }
-
+            //Up
             if (myGameArea.keys && myGameArea.keys[38]) {
                 accelerate(-0.2);
             } else {
                 accelerate(0.1)
             }
-
+            //Down
             if (myGameArea.keys && myGameArea.keys[40]) {
                 accelerate(0.2)
             }
@@ -183,16 +230,14 @@
             myGamePiece.newPos();
             myGamePiece.update();
         }
+
         function everyinterval(n) {
             if ((myGameArea.frameNo / n) % 1 == 0) { return true; }
             return false;
         }
 
-
-console.log(updateGameArea);
     </script>
 
 </body>
-<br>
-<button onclick="startGame()">Start Game</button>
+
 </html>

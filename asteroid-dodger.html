@@ -83,7 +83,8 @@
             myGameArea.start();
 
         }
-
+        //REMOVE -25 IT IS ONLY A TEMPORARY TEST
+        console.log('remove -25 on row 98')
         var myGameArea = {
             canvas: document.createElement("canvas"),
             start: function () {
@@ -94,7 +95,7 @@
 
                 if (screen.availHeight > 900) {
                     this.canvas.height = 900
-                } else { this.canvas.height = screen.availHeight }
+                } else { this.canvas.height = screen.availHeight - 25 }
 
                 console.log('canvas width: ' + this.canvas.width);
                 console.log('canvas height: ' + this.canvas.height);

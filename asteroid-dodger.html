@@ -297,13 +297,6 @@
                 myScoreObjects[i].update();
             }
 
-
-            //touch
-            if (myGameArea.touchX && myGameArea.touchY) {
-                myGamePiece.x = myGameArea.x;
-                myGamePiece.y = myGameArea.y;
-                console.log('touchstart');
-            }
             //Left
             if (myGameArea.keys && myGameArea.keys[37]) { myGamePiece.speedX = -3; }
             //Right

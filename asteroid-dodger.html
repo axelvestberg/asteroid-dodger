@@ -32,6 +32,7 @@
             margin: 0 auto;
             max-width: none;
             background: pink;
+
         }
 
         html,
@@ -78,8 +79,9 @@
         var myScoreObjects = [];
 
         function startGame() {
-            myGamePiece = new component(30, 30, "red", 80, 500);
+            myGamePiece = new component(30, 30, "red", 150, 300);
             myGameArea.start();
+
         }
 
         var myGameArea = {
@@ -107,7 +109,12 @@
                 })
                 window.addEventListener('keyup', function (e) {
                     myGameArea.keys[e.keyCode] = (e.type == "keydown");
+                    console.log('keyup');
                 })
+                window.addEventListener('touchstart', function () {
+                    console.log('touchstart');
+                });
+
             },
             stop: function () {
                 clearInterval(this.interval);
@@ -120,7 +127,8 @@
                 var score = Math.round((Math.pow(num, 2) / 10));
                 console.log(score);
                 ctx = myGameArea.context;
-                ctx.font = "75px Verdana";
+
+                ctx.font = "75px verdana";
                 ctx.fillStyle = "red";
                 ctx.textAlign = "center";
                 ctx.fillText(score, this.canvas.width / 2, this.canvas.height / 2);
@@ -289,6 +297,13 @@
                 myScoreObjects[i].update();
             }
 
+
+            //touch
+            if (myGameArea.touchX && myGameArea.touchY) {
+                myGamePiece.x = myGameArea.x;
+                myGamePiece.y = myGameArea.y;
+                console.log('touchstart');
+            }
             //Left
             if (myGameArea.keys && myGameArea.keys[37]) { myGamePiece.speedX = -3; }
             //Right
@@ -297,6 +312,8 @@
             if (myGameArea.keys && myGameArea.keys[38]) { accelerate(-0.2); } else { accelerate(0.1) }
             //Down
             if (myGameArea.keys && myGameArea.keys[40]) { accelerate(0.2) }
+
+
 
             myGamePiece.newPos();
             myGamePiece.update();

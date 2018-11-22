@@ -1,8 +1,15 @@
 var express = require("express");
-
 var app = express();
+var path = require('path');
 
-app.use(express.static('/asteroid-dodger.html'));
+//app.use(express.static('/asteroid-dodger.html'));
+
+// [START hello_world]
+// Say hello!
+app.get('/', (req, res) => {
+    res.status(200).sendFile(path.join(__dirname + '/asteroid-dodger.html'));
+  });
+  // [END hello_world]
 
 if (module === require.main) {
     // [START server]

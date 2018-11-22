@@ -38,6 +38,7 @@
         body {
             box-sizing: border-box;
             overflow: hidden;
+
         }
 
         *,
@@ -58,17 +59,18 @@
             background: gray;
         }
 
-        #app-container {
-            min-height: 100vh;
-            margin: 0 auto;
-            max-width: none;
-            background: pink;
+        .container {
+            -ms-overflow-style: none;
+            overflow: -moz-scrollbars-none;
+        }
 
+        .container::-webkit-scrollbar {
+            display: none;
         }
     </style>
 </head>
 
-<body onload="startGame()">
+<body class="container" onload="startGame()">
     <script>
 
         var myGamePiece;
